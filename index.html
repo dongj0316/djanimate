@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>animate</title>
+	<link rel="stylesheet" href="css/prism.css">
+	<script src="js/Djmoves.js"></script>
+<script src="js/prism.js"></script>
+	<style>
+		*{margin:0;padding:0;font-family: "Microsoft YaHei"}
+		/*body{background: #F4F4F4}*/
+		hr{margin: 20px 0;}
+		li{list-style: none;}
+		h1{text-align: center;margin-bottom: 50px;}
+		h3{margin-bottom: 25px}
+		p{text-indent: 30px;margin-bottom: 10px;}
+		pre{border-radius:5px;}
+		button{display: block;width: 100px;height:20px;background:#1E90FF;color:#fff;border:none;}
+		.container{padding:50px;}
+		#div{width:50px;height:50px;background:blue;position: absolute;top:50%;left:0;margin-top: -25px;}
+		.firstinfo{width:200px;height:100%;overflow:auto;position: absolute;right: 0;top: 0;background:#ccc;}
+		#times{width:100%;height:250px;padding-top: 10px;margin-bottom:50px;}
+		#times div{width:250px;height:20px;background:#000;margin-bottom: 10px;color:#fff;}
+		.bouncewrap{height:500px;width:100%;position: relative;margin-bottom: 20px;}
+		#bounce{
+			background: black;
+			border-radius: 50%;
+			height: 100px;
+			width: 100px;
+			margin: 0;
+			background: -webkit-radial-gradient(30px 30px, circle, #5cabff, #000);
+			background: -moz-radial-gradient(30px 30px, circle, #5cabff, #000);
+			background: radial-gradient(30px 30px, circle, #5cabff, #000);
+			position:absolute;
+			left:50%;
+			top:0;
+			margin-left: -50px;
+		}
+		#shadow{
+			width: 0;
+			height: 0;
+			position: absolute;
+			bottom:-25px;
+			left:50%;
+			margin-left: -25px;
+			background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.1) 40%, rgba(0, 0, 0, 0) 50%);
+			-webkit-transform: rotateX(70deg);
+			-moz-transform: rotateX(70deg);
+			-ms-transform: rotateX(70deg);
+			-o-transform: rotateX(70deg);
+			transform: rotateX(70deg);
+			z-index: -1;
+		}
+		.navwrap{width；100%;margin-top: 50px;position: relative;overflow:hidden;}
+		.navwrap ul{width:100%;overflow:hidden;background: #000;border-radius: 5px;}
+		.navwrap li{width:20%;height:50px;float:left;text-align: center;position: relative;line-height: 50px;font-size: 18px;font-weight: bold;color:#fff;z-index: 2;}
+		.navwrap li span{position: absolute;height:60%;width:3px;top:20%;right:-1px;background:#F5FFFA;}
+		.navwrap div{width:20%;height:100%;background:#F08080;position: absolute;left:0;top:0;z-index: 1;border-radius: 5px;}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>一个简单的动画插件</h1>
+		<p>有些项目并没有用jQuery，那么就很有必要自己封装个动画插件了！目前只是简单的实现原理，对于正常浏览器来说，动画使用translate等等css3属性实现当然是更好的！后续更新</p>
+		<hr>
+		<h3>用法：</h3>
+		<p><pre><code class="language-js">引入js文件：<span><</span>script type="text/javascript" src="js/Djmoves.js"><span><</span>/script></code></pre></p>
+		<div style="height:200px;position:relative">
+			<div id="div"></div>
+			<div class="firstinfo"></div>
+		</div>
+		
+		<pre><code class="language-js">
+var oD = document.getElementById('div'),
+		mD = DJ.move(oD);
+oD.onclick=function(){
+	this.parentNode.children[1].innerHTML = '';
+	mD.animate({'width':200,'height':200,'marginTop':-100},300,'bounceOut',function(t){
+		t.animate({'width':50,'height':50,'marginTop':-25},function(){},function(d){
+			d.parentNode.children[1].innerHTML+='当前width：'+d.offsetWidth + '<span><</span>br>';
+		});
+	},function(d){
+		d.parentNode.children[1].innerHTML+='当前width：'+d.offsetWidth + '<span><</span>br>';
+	});
+}
+</code></pre>
+		<p style="text-indent:0;">是不是很熟悉哈哈，下面介绍具体参数：</p>
+		<pre><code class="language-js">DJ.move(obj).animate(styles, speed, speedtype, callBack, movingCallBack)
+/*
+obj:运动元素
+styles:样式和值
+speed :动画的速度(总完成时间)
+speedtype:运动类型，具体有：linear(默认匀速)、easeOut(减速)、easeBoth(加速减速)、easeBothStrong(加加减减)、elasticOut(弹性渐出)、bounceOut(弹球渐出)......不够自己扩展吧
+callBack:动画完成后的回调
+movingCallBack:动画时执行(如果有这个参数，同时也需要callback参数，空函数即可)
+*/</code></pre>
+		<p style="text-indent:0;">来看看动画的设置时间和实际完成时间(10ms左右误差)，现有的六种运动类型：</p>
+		<div id="times">
+			<div>setTime：1000，realTime：</div>
+			<div>setTime：1000，realTime：</div>
+			<div>setTime：1000，realTime：</div>
+			<div>setTime：1000，realTime：</div>
+			<div>setTime：1000，realTime：</div>
+			<div>setTime：1000，realTime：</div>
+			<button id="btn1" style="margin-bottom:10px;">点击</button>
+			<button id="btn2">复原</button>
+		</div>
+		<h3>下面来看看几个小栗子：</h3>
+		<p>1.模仿球体下落(兼容样式可以用图片)</p>
+		<div class="bouncewrap">
+			<button id="btn3" style="margin-bottom:10px;">点击开始</button>
+			<button id="btn4">点击复原</button>
+			<div id="bounce"></div>
+			<div id="shadow"></div>
+		</div>
+		<pre style="margin-bottom:25px;"><code class="language-js">
+var oB = document.getElementById('bounce'),
+	oBs = document.getElementById('shadow'),
+	oBtn3 = document.getElementById('btn3');
+oBtn3.onclick = function(){
+	var dish = oB.parentNode.clientHeight - oB.offsetHeight;
+	DJ.move(oB).animate({top:dish},'bounceOut',1000,function(){},function(d){
+		oBs.style.width = d.offsetTop/3 + 'px';
+		oBs.style.height = d.offsetTop/3 + 'px';
+		oBs.style.bottom = -oBs.offsetHeight/2 + 'px';
+		oBs.style.marginLeft = -oBs.offsetWidth/2 + 'px';
+	})
+}</code></pre>
+		<p>2.弹性滑动导航菜单</p>
+		<div class="navwrap" id="nav">
+			<ul>
+				<li>html<span></span></li>
+				<li>css<span></span></li>
+				<li>javascript<span></span></li>
+				<li>jQuery<span></span></li>
+				<li>AngularJS</li>
+			</ul>
+			<div><span></span></div>
+		</div>
+		<pre><code class="language-js">
+var oN = document.getElementById('nav'),
+	oU = oN.children[0],
+	oNd = oN.children[1],
+	nowIndex = 0;
+for(var i = 0;oU.children[i];oU.children[i++].index = i-1)/*empty*/;
+oU.onmouseover = function(ev){
+	var e = ev || window.event,
+		target = ev.srcElement || ev.target,
+		w = this.children[0].clientWidth;
+	if(target.nodeName.toLowerCase() == 'li'){
+		if(target.index !== nowIndex){
+			DJ.move(oNd).animate({left:target.index*w},1200,'elasticOut')
+			nowIndex = target.index;
+		}
+	}
+}</code></pre>
+		<h3>以上就是大致的介绍了</h3>
+		<h2>觉得有帮助的朋友，可以动动手指头关注下我github：<a href="https://github.com/dongj0316">https://github.com/dongj0316</a></h2>
+	</div>
+	<script>
+	 	//用法
+		var oD = document.getElementById('div'),
+				mD = DJ.move(oD);
+		oD.onclick = function(){
+			this.parentNode.children[1].innerHTML = '';
+			mD.animate({'width':200,'height':200,'marginTop':-100},300,'bounceOut',function(t){
+				t.animate({'width':50,'height':50,'marginTop':-25},function(){},function(d){
+					d.parentNode.children[1].innerHTML+='当前width：'+d.offsetWidth + '<br>';
+				});
+			},function(d){
+				d.parentNode.children[1].innerHTML+='当前width：'+d.offsetWidth + '<br>';
+			});
+		}
+
+		//时间
+		var oBtn1 = document.getElementById('btn1'),
+			oBtn2 = document.getElementById('btn2'),
+			tD = document.getElementById('times'),
+			tcD = tD.children,
+			len = tcD.length,
+			arrtype = ['linear','easeOut','easeBoth','easeBothStrong','elasticOut','bounceOut']
+		oBtn1.onclick = function(){
+			var st = new Date();
+			for(var i = 0;i < len - 2;i++) {
+				DJ.move(tcD[i]).animate({width:500+i*10},1000,arrtype[i],function(d,t){
+					t.innerHTML = 'setTime：1000，realTime：'+((new Date()) - st);
+				})
+			}
+		}
+		oBtn2.onclick = function(){
+			var st = new Date();
+			for(var i = 0;i < len - 2;i++) {
+				DJ.move(tcD[i]).animate({width:250},1000,arrtype[i],function(d,t){
+					t.innerHTML = 'setTime：1000，realTime：'+((new Date()) - st);
+				});
+			}
+		}
+
+		//球体
+		var oB = document.getElementById('bounce'),
+			oBs = document.getElementById('shadow'),
+			oBtn3 = document.getElementById('btn3'),
+			oBtn4 = document.getElementById('btn4');
+		oBtn3.onclick = function(){
+			var dish = oB.parentNode.clientHeight - oB.offsetHeight;
+			DJ.move(oB).animate({top:dish},'bounceOut',1000,function(){},function(d){
+				oBs.style.width = d.offsetTop/3 + 'px';
+				oBs.style.height = d.offsetTop/3 + 'px';
+				oBs.style.bottom = -oBs.offsetHeight/2 + 'px';
+				oBs.style.marginLeft = -oBs.offsetWidth/2 + 'px';
+			})
+		}
+		oBtn4.onclick = function(){
+			DJ.move(oB).animate({top:0},function(){},function(d){
+				oBs.style.width = d.offsetTop/3 + 'px';
+				oBs.style.height = d.offsetTop/3 + 'px';
+				oBs.style.bottom = -oBs.offsetHeight/2 + 'px';
+				oBs.style.marginLeft = -oBs.offsetWidth/2 + 'px';
+			})
+		}
+
+		//导航
+		var oN = document.getElementById('nav'),
+			oU = oN.children[0],
+			oNd = oN.children[1],
+			nowIndex = 0;
+		for(var i = 0;oU.children[i];oU.children[i++].index = i-1)/*empty*/;
+		oU.onmouseover = function(ev){
+			var e = ev || window.event,
+				target = ev.srcElement || ev.target,
+				w = this.children[0].clientWidth;
+			if(target.nodeName.toLowerCase() == 'li'){
+				if(target.index !== nowIndex){
+					DJ.move(oNd).animate({left:target.index*w},1200,'elasticOut')
+					nowIndex = target.index;
+				}
+			}
+		}
+
+	</script>
+</body>
+</html>
