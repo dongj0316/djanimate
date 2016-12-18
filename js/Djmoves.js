@@ -7,7 +7,7 @@
     w.DJ.move = w.DJ.move || factory;
 
 })(this, document, function(w, d) {
-    //定时器,动画属性,初始属性值,位移量,运动时执行函数,动画是否开始
+    //全局定时器,动画属性,初始属性值,位移量,运动时执行函数,动画是否开始
     var globaltimer = null,
         amtattr = {},
         atStartAt = {},
@@ -150,6 +150,7 @@
             clearInterval(globaltimer);
             isStart = false;
         }
+        return this;
     };
     //t：当前流失时间 b：初始属性 c：变化量 d：给定的动画时间
     //匀速运动
